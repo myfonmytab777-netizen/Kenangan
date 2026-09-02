@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Kenangan Kelas — Memory Vault</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Pautan ke Fail CSS Berasingan -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-950 text-slate-200 min-h-screen relative selection:bg-slate-700 selection:text-white">
+
+  <!-- Kesan Latar Belakang Animasi -->
+  <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+    <div class="absolute -inset-[100%] opacity-30 bg-radial-spin"></div>
+  </div>
+
+  <!-- Notifikasi Pop-up -->
+  <div id="notificationBanner" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] hidden items-center gap-3 bg-slate-900/90 border border-slate-700 backdrop-blur-md px-5 py-3 rounded-xl shadow-2xl transition-all">
+    <span id="notifText" class="text-sm font-light tracking-wide text-slate-200">Mesej</span>
+  </div>
+
+  <!-- Navigasi Atas -->
+  <nav class="fixed top-0 w-full p-6 z-40 flex justify-end pointer-events-none">
+    <div class="pointer-events-auto flex items-center gap-4">
+      <button onclick="switchView('gallery')" id="navGalleryBtn" class="hidden text-slate-400 hover:text-white transition-all text-xs uppercase tracking-widest cursor-pointer">
+        Kembali ke Galeri
+      </button>
+      <button onclick="switchView('login')" id="navLoginBtn" class="text-slate-400 hover:text-white transition-all text-xs uppercase tracking-widest bg-slate-900/50 border border-slate-800 px-4 py-2 rounded-full hover:bg-slate-800 cursor-pointer">
+        Moderator
+      </button>
+    </div>
+  </nav>
+
+  <!-- Kandungan Utama -->
+  <main class="relative z-10 container mx-auto px-6 py-24 min-h-screen flex flex-col items-center">
+    
+    <!-- VIEW: GALERI UTAMA -->
+    <section id="galleryView" class="w-full max-w-6xl flex flex-col items-center">
+      <div class="text-center mb-24">
+        <h1 class="text-4xl md:text-6xl font-light tracking-widest uppercase mb-4">Kenangan <span class="font-semibold">Kelas</span></h1>
+        <p class="text-slate-400 tracking-[0.2em] uppercase text-xs md:text-sm">Slaid memori yang kekal abadi</p>
+      </div>
+
+      <div id="memoriesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 w-full">
+        <!-- Dirender secara dinamik melalui app.js -->
+      </div>
+    </section>
+
+    <!-- VIEW: LOGIN -->
+    <section id="loginView" class="hidden w-full max-w-md flex-1 flex items-center justify-center -mt-10">
+      <div class="w-full bg-slate-900/40 backdrop-blur-xl border border-slate-800 p-10 rounded-2xl shadow-2xl">
+        <div class="text-center mb-10">
+          <h2 class="text-2xl font-light tracking-wider">Akses Moderator</h2>
+        </div>
+        <form onsubmit="handleLoginSubmit(event)" class="space-y-6">
+          <input type="text" id="loginUser" class="w-full bg-black/40 border border-slate-800 focus:border-slate-400 rounded-lg px-4 py-3 outline-none transition-all text-sm text-white" placeholder="Kata Nama" required />
+          <input type="password" id="loginPass" class="w-full bg-black/40 border border-slate-800 focus:border-slate-400 rounded-lg px-4 py-3 outline-none transition-all text-sm text-white" placeholder="Kata Laluan" required />
+          <button type="submit" class="w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-slate-200 transition-all uppercase tracking-widest text-xs cursor-pointer">Log Masuk</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- VIEW: DASHBOARD -->
+    <section id="dashboardView" class="hidden w-full max-w-4xl">
+      <div class="flex justify-between items-end mb-12">
+        <div>
+          <h2 class="text-3xl font-light tracking-tight">Papan Pemuka</h2>
+          <p class="text-slate-500 text-xs uppercase tracking-widest mt-1">Moderator: GlacianDigital</p>
+        </div>
+        <button onclick="openAddModal()" class="bg-white text-black px-6 py-2.5 rounded-lg flex items-center gap-2 text-xs font-semibold hover:bg-slate-200 transition-all cursor-pointer">
+          Tambah Kenangan
+        </button>
+      </div>
+
+      <div id="dashboardList" class="space-y-4">
+        <!-- Dirender secara dinamik -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- LIGHTBOX SLIDESHOW -->
+  <div id="lightboxModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/95 backdrop-blur-2xl">
+    <button onclick="closeLightbox()" class="absolute top-8 right-8 text-slate-400 hover:text-white transition-all cursor-pointer">✕</button>
+    
+    <div class="relative w-full max-w-5xl h-full max-h-[85vh] flex flex-col md:flex-row gap-8 items-center justify-center">
+      <div class="relative flex-1 h-full w-full flex items-center justify-center group">
+        <div class="relative w-full h-full rounded-2xl overflow-hidden bg-black/40 shadow-2xl flex items-center justify-center">
+          <img id="lightboxImage" src="" class="max-h-full max-w-full object-contain" alt="" />
+        </div>
+        <button onclick="prevSlide()" id="prevSlideBtn" class="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-black/50 backdrop-blur-md rounded-full text-white hover:bg-white hover:text-black cursor-pointer hidden">❮</button>
+        <button onclick="nextSlide()" id="nextSlideBtn" class="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-black/50 backdrop-blur-md rounded-full text-white hover:bg-white hover:text-black cursor-pointer hidden">❯</button>
+      </div>
+
+      <div class="w-full md:w-80 flex flex-col justify-center text-center md:text-left">
+        <h2 id="lightboxName" class="text-3xl font-light mb-2">Nama</h2>
+        <p id="lightboxDate" class="text-xs text-slate-500 uppercase tracking-widest mb-6">Tarikh</p>
+        <div class="w-12 h-[1px] bg-slate-700 mb-6 mx-auto md:mx-0"></div>
+        <p id="lightboxDesc" class="text-slate-300 text-sm leading-relaxed italic">Keterangan</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: TAMBAH / EDIT -->
+  <div id="formModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg p-8 rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]">
+      <h3 id="formModalTitle" class="text-2xl font-light mb-8">Bina Memori Baru</h3>
+      <form onsubmit="handleFormSubmit(event)" class="space-y-6">
+        <input type="hidden" id="editMemoryId" />
+        <input type="text" id="inputName" placeholder="Nama" class="w-full bg-black/40 border border-slate-800 p-3 rounded-lg outline-none focus:border-white text-sm text-white" required />
+        <input type="text" id="inputDate" placeholder="Tarikh (Contoh: 12 Ogos 2026)" class="w-full bg-black/40 border border-slate-800 p-3 rounded-lg outline-none focus:border-white text-sm text-white" required />
+        
+        <div class="space-y-3">
+          <label class="block text-xs uppercase tracking-widest text-slate-500">Galeri Slaid (Boleh pilih banyak)</label>
+          <label class="flex flex-col items-center justify-center w-full min-h-[120px] border-2 border-dashed border-slate-800 rounded-xl cursor-pointer hover:bg-slate-800/35">
+            <div id="previewBox" class="flex flex-wrap gap-2 p-4 justify-center text-xs text-slate-400">Pilih gambar-gambar memori</div>
+            <input type="file" id="inputFile" multiple accept="image/*" onchange="handleMultipleImages(event)" class="hidden" />
+          </label>
+        </div>
+
+        <textarea id="inputDesc" placeholder="Keterangan..." rows="3" class="w-full bg-black/40 border border-slate-800 p-3 rounded-lg outline-none focus:border-white text-sm resize-none text-white"></textarea>
+        
+        <div class="flex gap-4 pt-4">
+          <button type="button" onclick="closeFormModal()" class="flex-1 text-slate-400 py-3 text-xs uppercase tracking-widest hover:text-white cursor-pointer">Batal</button>
+          <button type="submit" class="flex-1 bg-white text-black py-3 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-slate-200 cursor-pointer">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DELETE -->
+  <div id="deleteModal" class="fixed inset-0 z-[110] hidden items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+    <div class="bg-slate-900 border border-red-900/30 w-full max-w-xs p-8 rounded-2xl shadow-2xl text-center">
+      <input type="hidden" id="deleteTargetId" />
+      <h3 class="text-lg font-medium mb-2">Hapuskan Kenangan?</h3>
+      <p class="text-xs text-slate-500 mb-8 leading-relaxed">Tindakan ini tidak boleh dikembalikan.</p>
+      <div class="flex gap-3">
+        <button onclick="closeDeleteModal()" class="flex-1 py-2 rounded-lg text-xs uppercase tracking-widest border border-slate-800 hover:bg-slate-800 cursor-pointer">Batal</button>
+        <button onclick="confirmExecuteDelete()" class="flex-1 py-2 rounded-lg text-xs uppercase tracking-widest bg-red-500 text-white hover:bg-red-600 cursor-pointer">Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pautan ke Fail JavaScript Berasingan -->
+  <script src="app.js"></script>
+</body>
+</html>
